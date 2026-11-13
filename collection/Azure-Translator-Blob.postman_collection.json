@@ -1,0 +1,351 @@
+{
+  "info": {
+    "name": "Azure AI Translator + Blob Storage (traduccion de documentos)",
+    "description": "Flujo del articulo: subir, listar, traducir por lotes, consultar estado y eliminar documentos. Todas las claves y URLs con firma van en variables; no incluyas valores reales al exportar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Traducir texto (sincrono)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{translator_key}}",
+            "type": "text"
+          },
+          {
+            "key": "Ocp-Apim-Subscription-Region",
+            "value": "{{translator_region}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  { \"text\": \"Esto es un texto de prueba en castellano para traducir\" }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=es&to=en,fr",
+          "host": [
+            "api",
+            "cognitive",
+            "microsofttranslator",
+            "com"
+          ],
+          "path": [
+            "translate"
+          ],
+          "query": [
+            {
+              "key": "api-version",
+              "value": "3.0"
+            },
+            {
+              "key": "from",
+              "value": "es"
+            },
+            {
+              "key": "to",
+              "value": "en,fr"
+            }
+          ]
+        },
+        "description": "Traduccion de texto corto. Opcional; no forma parte del flujo de documentos."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Blob - subir documento (origen)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/pdf",
+            "type": "text"
+          },
+          {
+            "key": "x-ms-blob-type",
+            "value": "BlockBlob",
+            "type": "text"
+          },
+          {
+            "key": "x-ms-version",
+            "value": "2025-11-05",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://{{storage_account}}.blob.core.windows.net/{{container_origen}}/{{blob_name}}?{{token_origen}}",
+          "host": [
+            "{{storage_account}}",
+            "blob",
+            "core",
+            "windows",
+            "net"
+          ],
+          "path": [
+            "{{container_origen}}",
+            "{{blob_name}}"
+          ],
+          "query": [
+            {
+              "key": "{{token_origen}}",
+              "value": null
+            }
+          ]
+        },
+        "description": "Body > binary: elige el fichero. SAS del origen con permisos r, l (y c/w si subes desde aqui).",
+        "body": {
+          "mode": "file"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Blob - listar documentos (origen)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-ms-version",
+            "value": "2025-11-05",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://{{storage_account}}.blob.core.windows.net/{{container_origen}}?restype=container&comp=list&{{token_origen}}",
+          "host": [
+            "{{storage_account}}",
+            "blob",
+            "core",
+            "windows",
+            "net"
+          ],
+          "path": [
+            "{{container_origen}}"
+          ],
+          "query": [
+            {
+              "key": "restype",
+              "value": "container"
+            },
+            {
+              "key": "comp",
+              "value": "list"
+            },
+            {
+              "key": "{{token_origen}}",
+              "value": null
+            }
+          ]
+        },
+        "description": ""
+      },
+      "response": []
+    },
+    {
+      "name": "4. Blob - eliminar documento (origen)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-ms-version",
+            "value": "2025-11-05",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://{{storage_account}}.blob.core.windows.net/{{container_origen}}/{{blob_name}}?{{token_origen}}",
+          "host": [
+            "{{storage_account}}",
+            "blob",
+            "core",
+            "windows",
+            "net"
+          ],
+          "path": [
+            "{{container_origen}}",
+            "{{blob_name}}"
+          ],
+          "query": [
+            {
+              "key": "{{token_origen}}",
+              "value": null
+            }
+          ]
+        },
+        "description": "Prueba solo con documentos de prueba. El SAS necesita permiso d."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Blob - listar documentos (destino)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-ms-version",
+            "value": "2025-11-05",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://{{storage_account}}.blob.core.windows.net/{{container_destino}}?restype=container&comp=list&{{token_destino}}",
+          "host": [
+            "{{storage_account}}",
+            "blob",
+            "core",
+            "windows",
+            "net"
+          ],
+          "path": [
+            "{{container_destino}}"
+          ],
+          "query": [
+            {
+              "key": "restype",
+              "value": "container"
+            },
+            {
+              "key": "comp",
+              "value": "list"
+            },
+            {
+              "key": "{{token_destino}}",
+              "value": null
+            }
+          ]
+        },
+        "description": ""
+      },
+      "response": []
+    },
+    {
+      "name": "6. Blob - eliminar documento (destino)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-ms-version",
+            "value": "2025-11-05",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://{{storage_account}}.blob.core.windows.net/{{container_destino}}/{{blob_name}}?{{token_destino}}",
+          "host": [
+            "{{storage_account}}",
+            "blob",
+            "core",
+            "windows",
+            "net"
+          ],
+          "path": [
+            "{{container_destino}}",
+            "{{blob_name}}"
+          ],
+          "query": [
+            {
+              "key": "{{token_destino}}",
+              "value": null
+            }
+          ]
+        },
+        "description": "El SAS necesita permiso d."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Translator - lanzar traduccion de documentos (batch)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{translator_key}}",
+            "type": "text"
+          },
+          {
+            "key": "Ocp-Apim-Subscription-Region",
+            "value": "{{translator_region}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"inputs\": [\n    {\n      \"source\": {\n        \"sourceUrl\": \"{{source_container_sas_url}}\"\n      },\n      \"targets\": [\n        {\n          \"targetUrl\": \"{{target_container_sas_url}}\",\n          \"language\": \"{{target_language}}\"\n        }\n      ]\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{translator_endpoint}}/translator/document/batches?api-version=2026-03-01",
+          "host": [
+            "{{translator_endpoint}}"
+          ],
+          "path": [
+            "translator",
+            "document",
+            "batches"
+          ],
+          "query": [
+            {
+              "key": "api-version",
+              "value": "2026-03-01"
+            }
+          ]
+        },
+        "description": "sourceUrl: URL del contenedor origen con SAS (permisos r,l). targetUrl: URL del contenedor destino con SAS (permisos w,l). Un idioma por peticion."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Translator - consultar estado del trabajo",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{translator_key}}",
+            "type": "text"
+          },
+          {
+            "key": "Ocp-Apim-Subscription-Region",
+            "value": "{{translator_region}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{translator_endpoint}}/translator/text/batch/v1.1/batches/{{job_id}}",
+          "host": [
+            "{{translator_endpoint}}"
+          ],
+          "path": [
+            "translator",
+            "text",
+            "batch",
+            "v1.1",
+            "batches",
+            "{{job_id}}"
+          ]
+        },
+        "description": "Revisa summary: Succeeded global no garantiza que todos los documentos se hayan traducido bien."
+      },
+      "response": []
+    }
+  ]
+}

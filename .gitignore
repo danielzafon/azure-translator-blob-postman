@@ -1,0 +1,8 @@
+# Entornos con valores reales (la plantilla .template.json sí se sube)
+*.postman_environment.json
+!*.postman_environment.template.json
+*.postman_globals.json
+
+# Varios
+.DS_Store
+.env
